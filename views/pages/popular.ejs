@@ -1,0 +1,18 @@
+<h1 class="page-title">Popular</h1>
+
+<div class="books-container">
+  <% popularBooks.forEach(book=> { %>
+    <div class="book-info">
+      <h3 class="book-title">
+        <%- book.title %>
+      </h3>
+      <p class="book-desc">
+        <%- book.desc %>
+      </p>
+      <form action="/add-favourite" method="POST">
+        <input style="display: none;" name="bookId" value=<%- book.id %> >
+        <button class="add-fav" type="submit">Add to favoutite</button>
+      </form>
+    </div>
+    <% }) %>
+</div>

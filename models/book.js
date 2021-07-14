@@ -7,12 +7,6 @@ const booksPath = path.join(
   'books.json'
 );
 
-const favBooksPath = path.join(
-  path.dirname(process.mainModule.filename),
-  'data',
-  'favourites.json'
-);
-
 const newBooksPath = path.join(
   path.dirname(process.mainModule.filename),
   'data',
@@ -54,27 +48,26 @@ module.exports = class Book {
     getBooksFromFile(cb, popularBooksPath);
   }
 
-  static addBookToFile = (newBook, cb) => {
+  save(cb) {
     getBooksFromFile((books) => {
-      const doesExist = books.some((book) => book.title === newBook.title);
-      console.log(books, newBook);
+      const doesExist = books.some((book) => book.title === this.title);
+      console.log(books, this);
       if (doesExist) {
         cb(true);
       } else {
-        fs.writeFile(booksPath, JSON.stringify([...books, newBook]), (err) => {
+        books.push(this);
+
+        fs.writeFile(booksPath, JSON.stringify(books), (err) => {
           if (err) return cb(true);
 
           getBooksFromFile((books) => {
-            fs.writeFile(
-              newBooksPath,
-              JSON.stringify([...books, newBook]),
-              (err) => {
-                cb(err);
-              }
-            );
+            books.push(this);
+            fs.writeFile(newBooksPath, JSON.stringify(books), (err) => {
+              cb(err);
+            });
           }, newBooksPath);
         });
       }
     }, booksPath);
-  };
+  }
 };

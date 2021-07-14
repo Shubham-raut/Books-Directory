@@ -13,7 +13,7 @@ exports.postAddBook = (req, res, next) => {
   const id = Math.random().toString();
   const book = new Book(id, title, description);
 
-  Book.addBookToFile(book, (err) => {
+  book.save((err) => {
     if (err) {
       console.log('Something went wrong');
       res.send({ status: 404, err: 'Something went wrong' });

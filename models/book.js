@@ -1,73 +1,60 @@
-const fs = require('fs');
-const path = require('path');
-
-const booksPath = path.join(
-  path.dirname(process.mainModule.filename),
-  'data',
-  'books.json'
-);
-
-const newBooksPath = path.join(
-  path.dirname(process.mainModule.filename),
-  'data',
-  'new-arrivals.json'
-);
-
-const popularBooksPath = path.join(
-  path.dirname(process.mainModule.filename),
-  'data',
-  'popular.json'
-);
-
-const getBooksFromFile = (cb, p) => {
-  fs.readFile(p, (err, fileContent) => {
-    if (err) {
-      cb([]);
-    } else {
-      cb(JSON.parse(fileContent));
-    }
-  });
-};
+const db = require('../util/database');
 
 module.exports = class Book {
-  constructor(id, title, desc) {
-    this.id = id;
+  constructor(title, description, price) {
     this.title = title;
-    this.desc = desc;
+    this.description = description;
+    this.price = price;
   }
 
-  static fetchAllBooks(cb) {
-    getBooksFromFile(cb, booksPath);
+  save() {
+    return db.execute(
+      'INSERT INTO BOOKS (title, description, price, isNew) VALUES (?,?,?,?)',
+      [this.title, this.description, this.price, 1]
+    );
   }
 
-  static fetchAllNewBooks(cb) {
-    getBooksFromFile(cb, newBooksPath);
+  static fetchAllBooks() {
+    return db.execute('SELECT * FROM books');
   }
 
-  static fetchAllPopularBooks(cb) {
-    getBooksFromFile(cb, popularBooksPath);
+  static fetchAllNewBooks() {
+    return db.execute('SELECT * FROM books WHERE isNew = 1');
   }
 
-  save(cb) {
-    getBooksFromFile((books) => {
-      const doesExist = books.some((book) => book.title === this.title);
-      console.log(books, this);
-      if (doesExist) {
-        cb(true);
-      } else {
-        books.push(this);
+  static fetchAllPopularBooks() {
+    return db.execute('SELECT * FROM books WHERE isPopular = 1');
+  }
 
-        fs.writeFile(booksPath, JSON.stringify(books), (err) => {
-          if (err) return cb(true);
+  static fetchAllFavouriteBooks() {
+    return db.execute('SELECT * FROM books WHERE isFavourite = 1');
+  }
 
-          getBooksFromFile((books) => {
-            books.push(this);
-            fs.writeFile(newBooksPath, JSON.stringify(books), (err) => {
-              cb(err);
-            });
-          }, newBooksPath);
-        });
-      }
-    }, booksPath);
+  static addToFavourite(bookId) {
+    return db.execute('UPDATE books SET isFavourite = 1 WHERE id = ?', [
+      bookId,
+    ]);
+  }
+
+  static removeFromFavourite(bookId) {
+    return db.execute('UPDATE books SET isFavourite = 0 WHERE id = ?', [
+      bookId,
+    ]);
+  }
+
+  static limitNewBooks() {
+    db.execute(
+      'SELECT COUNT( * ) as "newBooksCount" FROM books WHERE isNew = 1'
+    )
+      .then(([res]) => {
+        const newBooksCount = res[0].newBooksCount;
+        if (newBooksCount > 5) {
+          db.execute(
+            'UPDATE books SET isNew = 0 WHERE isNew = 1 ORDER BY id LIMIT ?',
+            [newBooksCount - 5]
+          );
+        }
+      })
+      .catch((err) => console.log('in catch', err));
   }
 };

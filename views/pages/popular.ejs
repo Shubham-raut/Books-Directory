@@ -6,9 +6,15 @@
       <h3 class="book-title">
         <%- book.title %>
       </h3>
-      <p class="book-desc">
-        <%- book.desc %>
+
+      <h2 class="book-price">
+        <%- book.price %> Rs.
+      </h2>
+
+      <p class="book-description">
+        <%- book.description %>
       </p>
+
       <form action="/add-favourite" method="POST">
         <input style="display: none;" name="bookId" value=<%- book.id %> >
         <button class="add-fav" type="submit">Add to favoutite</button>

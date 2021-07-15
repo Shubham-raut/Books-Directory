@@ -1,34 +1,40 @@
-const Favourites = require('../models/favourites');
-const Book = require('../models/favourites');
+const Book = require('../models/book');
 
 exports.getFevourites = (req, res, next) => {
-  Book.fetchAllFavouriteBooks((favBooks) => {
-    res.render('index', {
-      path: '/favourites',
-      pageTitle: 'Favourites',
-      favBooks: favBooks,
+  Book.fetchAllFavouriteBooks()
+    .then(([favBooks]) => {
+      res.render('index', {
+        path: '/favourites',
+        pageTitle: 'Favourites',
+        favBooks: favBooks,
+      });
+    })
+    .catch((err) => {
+      console.log('Something went wrong');
+      res.send({ status: 404, err: err });
     });
-  });
 };
 
 exports.addFavourite = (req, res, next) => {
   console.log(req.body);
-  Favourites.addToFavourite(req.body.bookId, (err) => {
-    if (err) {
-      console.log('Something went wrong');
-    } else {
+  Book.addToFavourite(req.body.bookId)
+    .then((err) => {
       res.redirect('/favourites');
-    }
-  });
+    })
+    .catch((err) => {
+      console.log('Something went wrong');
+      res.send({ status: 404, err: err });
+    });
 };
 
 exports.removeFavourite = (req, res, next) => {
   console.log(req.body);
-  Favourites.removeFromFavourite(req.body.bookId, (err) => {
-    if (err) {
-      console.log('Something went wrong');
-    } else {
+  Book.removeFromFavourite(req.body.bookId)
+    .then((err) => {
       res.redirect('/favourites');
-    }
-  });
+    })
+    .catch((err) => {
+      console.log('Something went wrong');
+      res.send({ status: 404, err: err });
+    });
 };

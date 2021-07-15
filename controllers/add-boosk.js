@@ -8,17 +8,19 @@ exports.getAddBook = (req, res, next) => {
 };
 
 exports.postAddBook = (req, res, next) => {
-  const { title, description } = req.body;
-  console.log(title, description);
-  const id = Math.random().toString();
-  const book = new Book(id, title, description);
+  const { title, description, price } = req.body;
+  console.log(title, description, price);
 
-  book.save((err) => {
-    if (err) {
-      console.log('Something went wrong');
-      res.send({ status: 404, err: 'Something went wrong' });
-    } else {
+  const book = new Book(title, description, price);
+
+  book
+    .save()
+    .then(() => {
       res.redirect('/');
-    }
-  });
+      Book.limitNewBooks();
+    })
+    .catch((err) => {
+      console.log('Something went wrong');
+      res.send({ status: 404, err: err });
+    });
 };

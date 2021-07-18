@@ -13,8 +13,8 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 const homeRoutes = require('./routes/home');
-const new_arrivalsRoutes = require('./routes/new-arrivals');
-const popularRoutes = require('./routes/popular');
+// const new_arrivalsRoutes = require('./routes/new-arrivals');
+// const popularRoutes = require('./routes/popular');
 const favouriteRoutes = require('./routes/favourite');
 const addBookRoutes = require('./routes/add-book');
 
@@ -31,8 +31,8 @@ app.use((req, res, next) => {
 });
 
 app.use(homeRoutes);
-app.use(new_arrivalsRoutes);
-app.use(popularRoutes);
+// app.use(new_arrivalsRoutes);
+// app.use(popularRoutes);
 app.use(favouriteRoutes);
 app.use(addBookRoutes);
 

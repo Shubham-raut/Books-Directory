@@ -1,8 +1,8 @@
-const Book = require('../models/book');
-
 exports.getHome = (req, res, next) => {
-  Book.fetchAllBooks()
-    .then(([books]) => {
+  console.log('Get Home');
+  req.user
+    .getBooks()
+    .then((books) => {
       res.render('index', {
         path: '/',
         pageTitle: 'Home',

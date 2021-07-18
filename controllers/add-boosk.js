@@ -1,5 +1,3 @@
-const Book = require('../models/book');
-
 exports.getAddBook = (req, res, next) => {
   res.render('index', {
     path: '/add-book',
@@ -11,13 +9,10 @@ exports.postAddBook = (req, res, next) => {
   const { title, description, price } = req.body;
   console.log(title, description, price);
 
-  const book = new Book(title, description, price);
-
-  book
-    .save()
+  req.user
+    .createBook({ title, description, price })
     .then(() => {
       res.redirect('/');
-      Book.limitNewBooks();
     })
     .catch((err) => {
       console.log('Something went wrong');
